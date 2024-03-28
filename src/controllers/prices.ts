@@ -14,7 +14,9 @@ export class PriceController {
       const product = await Product.findOne({ name: product_name });
 
       if (!product) return res.status(404).json({ error: 'Product not found' });
-      if (!user?.metadata) return res.status(200).send({ basePrice: product.basePrice });
+
+      const basePrice = product.basePrice;
+      if (!user?.metadata) return res.status(200).send({ basePrice });
 
       const { precios_especiales } = user.metadata;
 
@@ -24,10 +26,12 @@ export class PriceController {
       });
 
       if (productWithSpecialPrice) {
-        res.status(200).send({
+        return res.status(200).send({
           specialPrice: productWithSpecialPrice.precio_especial_personal
         });
       }
+
+      res.status(200).send({ basePrice });
     } catch (error) {
       res.status(400).send({ error: error.message });
     }
